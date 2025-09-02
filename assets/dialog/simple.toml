@@ -1,0 +1,8 @@
+[root]
+start_node = "say_hi"
+
+[talk."say_hi"]
+text = [
+  "Oh hi, there!",
+  "This is a new dialog asset.",
+]

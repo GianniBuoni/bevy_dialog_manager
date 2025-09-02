@@ -1,0 +1,66 @@
+# root node defines the core checks, variables, and actors of the conversation
+# the serializer/asset loader/parser will start here before handling the rest of the nodes.
+[root]
+# all characters present in the conversation
+# serde: array of string tables
+actors = [{name = "sign", display = "Signpost"}]
+# events and resources needed for the conversation to happen.
+# the crate should search of these necessary types upon loading
+# the asset and error out/warn if they aren't registered types.
+# serde: array of strings
+events = ["next_level"]
+resources = ["player_score", "want_score"]
+# special resource type: human readable wrapper for a boolean
+# the asset should warn the user if they aren't registered types.
+# serde: array of strings
+flags = ["enough_gold"]
+# specifies the starting node in the convesation tree
+# serde: string
+start_node = "gold_check"
+
+# check nodes look for flag resource type(s) in the game
+# if the resource(s) is true, the conversaton advances to the pass node.
+# if false or none are found, the conversation advances to a fail node.
+[check."gold_check"]
+flags = ["enough_gold"]
+pass = "get_more"
+fail = "next_level"
+
+# choice nodes branch out with player input
+# under the hood, it can search for a ChoiceEvent(usize)
+[choice."next_level"]
+actors = ["sign"]
+text = [
+  {id = 0, weight = 0.5, text = "_Wow_, you collected {player_score} coins!"},
+  {id = 0, weight = 0.5, text = "_Wow_, you over {want_score}!"},
+  "Want to go to the next level?",
+];
+choices = [
+  # is this how would we introduce variance? like sometimes saying "Nope"
+  # instead of "Nah"
+  {id = 0, text = "Nah.", next = "good_luck" },
+  {id = 0, text = "Nope.", next = "good_luck" },
+  {id = 0, text = "Yeah...no", next = "good_luck" },
+  {text = "Hell, yeah!" next = "next_level_event"}
+]
+
+# an event node writes an event to the event writer
+[event."next_level_event"]
+write = "next_level"
+
+# talk nodes are the most basic dialog node. It displays text.
+[talk."good_luck"]
+actor = ["sign"]
+text = ["Alrighty! Good luck; talk to me again when you want to leave."]
+
+# orphan nodes should create an error on loading?
+[talk."explain"]
+actors = ["sign"]
+text = ["_Are you daft?_ You finished the level"]
+
+[talk."get_more"]
+actors = ["sign"]
+text = [
+  "Hey buddy, you only got {player_score} coins.",
+  "Talk to me again when you have {want_score}.",
+]
