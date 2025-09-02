@@ -6,3 +6,10 @@ text = [
   "Oh hi, there!",
   "This is a new dialog asset.",
 ]
+next = "random"
+
+[talk."random"]
+text = [
+  {id = 0, line = "This is a random line."}
+  {id = 0, line = "This another random line."}
+]
