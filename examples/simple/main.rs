@@ -9,6 +9,7 @@ fn main() {
     app.run();
 }
 
-fn hello_world() {
+fn hello_world(asset_server: Res<AssetServer>) {
+    let _asset = asset_server.load::<DialogScript>("dialog/simple.toml");
     info!("Hello from Bevy!");
 }

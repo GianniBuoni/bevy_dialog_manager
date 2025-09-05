@@ -1,19 +1,33 @@
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
+mod errors;
+mod loaders;
 mod nodes;
 
 pub mod prelude {
     pub use super::DialogManagerPlugin;
-    pub(crate) use super::Line;
+    pub use super::Line;
+    pub use super::errors::prelude::*;
+    pub(crate) use super::loaders::prelude::*;
+    pub use super::nodes::prelude::*;
 }
 
-/// type alias for [`Arc<str>`]
-pub(crate) type Line = std::sync::Arc<str>;
+/// newtype alias for [`Arc<str>`]
+#[derive(Debug, Default, Clone, Reflect)]
+pub struct Line(std::sync::Arc<str>);
+
+impl From<&str> for Line {
+    fn from(value: &str) -> Self {
+        Self(value.into())
+    }
+}
 
 pub struct DialogManagerPlugin;
 
 impl PluginGroup for DialogManagerPlugin {
     fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>().add(nodes::NodesPlugin)
+        PluginGroupBuilder::start::<Self>()
+            .add(nodes::NodesPlugin)
+            .add(loaders::DialogLoaderPlugin)
     }
 }
