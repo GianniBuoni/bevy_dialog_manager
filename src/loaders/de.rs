@@ -1,6 +1,4 @@
-use std::str::FromStr;
-
-use bevy::platform::collections::HashMap;
+use indexmap::IndexMap;
 use serde::{
     Deserialize,
     de::{self, Visitor},
@@ -30,11 +28,12 @@ impl<'de> Deserialize<'de> for TomlNodeMap {
             where
                 A: serde::de::MapAccess<'de>,
             {
-                let mut node_map = HashMap::new();
+                let mut node_map = IndexMap::new();
                 while let Some((k, v)) = map.next_entry::<String, Table>()? {
-                    let v = TomlNode::deserialize(v)
+                    let line = Line(k.into());
+                    let node = TomlNode::deserialize(v)
                         .map_err(|e| de::Error::custom(e))?;
-                    node_map.insert(k, v);
+                    node_map.insert(line, node);
                 }
                 Ok(TomlNodeMap(node_map))
             }
@@ -71,19 +70,8 @@ impl<'de> Deserialize<'de> for TomlNode {
                 else {
                     return Ok(TomlNode::None);
                 };
-                // initialize node struct from string
-                let mut node = TomlNode::from_str(&node)
+                let node = TomlNode::from_toml_value(node.as_str(), value)
                     .map_err(|e| de::Error::custom(e))?;
-
-                // deserialize value
-                match node {
-                    TomlNode::Talk(_) => {
-                        let talk = TomlTalk::deserialize(value)
-                            .map_err(|e| de::Error::custom(e))?;
-                        node = TomlNode::Talk(talk);
-                    }
-                    TomlNode::None => {}
-                }
 
                 Ok(node)
             }
@@ -106,10 +94,10 @@ impl<'de> Deserialize<'de> for Line {
                 &self,
                 formatter: &mut std::fmt::Formatter,
             ) -> std::fmt::Result {
-                write!(formatter, "String")
+                write!(formatter, "string")
             }
 
-            fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
             where
                 E: de::Error,
             {
@@ -120,15 +108,15 @@ impl<'de> Deserialize<'de> for Line {
     }
 }
 
-impl<'de> Deserialize<'de> for TomlLine {
+impl<'de> Deserialize<'de> for TextLine {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: de::Deserializer<'de>,
     {
-        struct TomlLineVisitor;
+        struct TextLineVisitor;
 
-        impl<'de> Visitor<'de> for TomlLineVisitor {
-            type Value = TomlLine;
+        impl<'de> Visitor<'de> for TextLineVisitor {
+            type Value = TextLine;
 
             fn expecting(
                 &self,
@@ -141,7 +129,7 @@ impl<'de> Deserialize<'de> for TomlLine {
             where
                 A: de::MapAccess<'de>,
             {
-                let mut line_map = HashMap::new();
+                let mut line_map = IndexMap::new();
                 while let Some((k, v)) =
                     map.next_entry::<String, toml::Value>()?
                 {
@@ -149,7 +137,6 @@ impl<'de> Deserialize<'de> for TomlLine {
                 }
                 let line = line_map
                     .get("line")
-                    // change to error?
                     .unwrap_or(&toml::Value::String(String::default()))
                     .as_str()
                     .unwrap_or_default()
@@ -167,21 +154,21 @@ impl<'de> Deserialize<'de> for TomlLine {
                     .as_float()
                     .unwrap_or_default() as f32;
 
-                Ok(TomlLine { line, id, weight })
+                Ok(TextLine { line, id, weight })
             }
 
             fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
             where
                 E: de::Error,
             {
-                let line = Line(v.as_str().into());
-                Ok(TomlLine {
+                let line = Line(v.into());
+                Ok(TextLine {
                     line,
                     id: 0,
                     weight: 1.,
                 })
             }
         }
-        deserializer.deserialize_any(TomlLineVisitor)
+        deserializer.deserialize_any(TextLineVisitor)
     }
 }

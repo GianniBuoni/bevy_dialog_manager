@@ -12,4 +12,6 @@ pub enum DialogLoaderError {
     Io(#[from] std::io::Error),
     #[error("Could not parse TOML. {0}")]
     Toml(#[from] toml::de::Error),
+    #[error("Coudn't convert TOML to a Dialog asset: {message}")]
+    TryFrom { message: String },
 }

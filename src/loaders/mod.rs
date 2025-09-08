@@ -1,5 +1,4 @@
-use bevy::{asset::AssetLoader, platform::collections::HashMap, prelude::*};
-use toml::Table;
+use bevy::{asset::AssetLoader, prelude::*};
 
 use crate::prelude::*;
 
@@ -40,21 +39,18 @@ impl AssetLoader for DialogAssetLoader {
         // deserialize the bytes into TOML
         let raw_script =
             toml::from_slice::<TomlScript>(&bytes).map_err(|e| {
-                let debug = match toml::from_slice::<Table>(&bytes) {
-                    Ok(d) => d,
+                match toml::from_slice::<toml::Table>(&bytes) {
+                    Ok(d) => {
+                        dbg!(d);
+                    }
                     Err(e) => {
                         return e;
                     }
-                };
-                dbg!(debug);
+                }
                 e
             })?;
-        dbg!(raw_script);
-
-        // parse the TomlScript into DialogScript
-
-        // placeholder
-        Ok(DialogScript(HashMap::new()))
+        // parse the toml script into a dialog script
+        raw_script.try_into()
     }
 
     fn extensions(&self) -> &[&str] {

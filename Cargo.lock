@@ -299,6 +299,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bevy",
+ "indexmap",
  "serde",
  "strum",
  "thiserror 2.0.16",
@@ -1008,6 +1009,7 @@ checksum = "f2481980430f9f78649238835720ddccc57e52df14ffce1c6f37391d61b563e9"
 dependencies = [
  "equivalent",
  "hashbrown",
+ "serde",
 ]
 
 [[package]]

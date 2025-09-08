@@ -13,7 +13,7 @@ pub mod prelude {
 }
 
 /// newtype alias for [`Arc<str>`]
-#[derive(Debug, Default, Clone, Reflect)]
+#[derive(Debug, Default, Clone, Reflect, Hash, PartialEq, Eq)]
 pub struct Line(std::sync::Arc<str>);
 
 impl From<&str> for Line {

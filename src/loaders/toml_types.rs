@@ -1,52 +1,50 @@
 //! Module for all the intermediate types for asset loading
 //! TomlTypes are what's serialized diretly from the TOML types
 
-use bevy::platform::collections::HashMap;
+use indexmap::IndexMap;
 use serde::Deserialize;
-use strum::EnumString;
+use strum::Display;
 
 use crate::prelude::*;
 
 pub mod predlude {
-    pub(crate) use super::{
-        TomlLine, TomlNode, TomlNodeMap, TomlScript, TomlTalk,
-    };
+    pub(crate) use super::{TomlNode, TomlNodeMap, TomlScript, TomlTalk};
 }
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct TomlScript {
-    root: TomlRoot,
-    script: TomlNodeMap,
-}
-
-#[derive(Debug, Deserialize)]
-pub(crate) struct TomlRoot {
-    start_node: String,
+    pub(crate) root: RootNode,
+    pub(crate) script: TomlNodeMap,
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct TomlNodeMap(pub(crate) HashMap<String, TomlNode>);
+pub(crate) struct TomlNodeMap(pub(crate) IndexMap<Line, TomlNode>);
 
-#[derive(Debug, Default, EnumString)]
+#[derive(Debug, Display, Default)]
 pub(crate) enum TomlNode {
     #[default]
     None,
-    #[strum(serialize = "talk")]
     Talk(TomlTalk),
+}
+
+impl TomlNode {
+    pub fn from_toml_value(
+        node_type: &str,
+        value: toml::Table,
+    ) -> Result<Self, DialogLoaderError> {
+        let node = match node_type {
+            "talk" => TomlNode::Talk(TomlTalk::deserialize(value)?),
+            _ => TomlNode::None,
+        };
+        Ok(node)
+    }
 }
 
 #[derive(Debug, Default, Deserialize)]
 pub(crate) struct TomlTalk {
-    text: TomlText,
-    next: Option<Line>,
+    pub(crate) text: TomlText,
+    pub(crate) next: Option<Line>,
 }
 
 #[derive(Debug, Default, Deserialize)]
-pub(crate) struct TomlText(Vec<TomlLine>);
-
-#[derive(Debug, Default)]
-pub(crate) struct TomlLine {
-    pub(crate) line: Line,
-    pub(crate) id: usize,
-    pub(crate) weight: f32,
-}
+pub(crate) struct TomlText(pub Vec<TextLine>);
