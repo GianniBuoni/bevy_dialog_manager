@@ -51,7 +51,7 @@ impl<'de> Deserialize<'de> for TextLine {
                 Ok(TextLine { line, id, weight })
             }
 
-            fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
             where
                 E: de::Error,
             {
@@ -64,5 +64,56 @@ impl<'de> Deserialize<'de> for TextLine {
             }
         }
         deserializer.deserialize_any(TextLineVisitor)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Deserialize, PartialEq, Debug)]
+    struct TestStruct {
+        text: TextLine,
+    }
+
+    #[test]
+    fn test_de() -> Result<()> {
+        let mut test_cases = Vec::new();
+        test_cases.push((
+            TestStruct {
+                text: TextLine {
+                    line: Line("Oh hi, there!".into()),
+                    id: 0,
+                    weight: 1.,
+                },
+            },
+            "text = \"Oh hi, there!\"",
+            "string",
+        ));
+        test_cases.push((
+            TestStruct {
+                text: TextLine {
+                    line: Line("This is a random line.".into()),
+                    id: 0,
+                    weight: 0.5,
+                },
+            },
+            "text = {id = 0, weight = 0.5, line = \"This is a random line.\"}",
+            "map",
+        ));
+        de_test::<TestStruct>(test_cases)
+    }
+
+    #[test]
+    fn test_de_error() {
+        let test_cases = vec![
+            ("invalid toml", "invalid toml"),
+            ("text = [1, 2, 3]", "invalid type"),
+            (
+                "text = [1, 2, \"three\"]",
+                "invalid type: mixed strings and int",
+            ),
+        ];
+        de_error_test::<TestStruct>(test_cases)
     }
 }

@@ -19,7 +19,7 @@ pub enum DialogNode {
     Talk(TalkNode),
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug, Display, PartialEq)]
 pub(crate) enum TomlNode {
     Talk(TomlTalk),
 }

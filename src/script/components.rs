@@ -23,7 +23,7 @@ impl From<&str> for Line {
 }
 
 /// Basic element of a dialog node.
-#[derive(Debug, Clone, Reflect)]
+#[derive(Debug, Clone, PartialEq, Reflect)]
 pub struct TextLine {
     pub line: Line,
     pub id: usize,

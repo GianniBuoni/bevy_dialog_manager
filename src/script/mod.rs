@@ -45,7 +45,7 @@ pub(crate) struct TomlScript {
     pub(crate) script: TomlNodeMap,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 pub(crate) struct TomlNodeMap(pub(crate) HashMap<Line, TomlNode>);
 
 impl From<TomlScript> for DialogScript {
