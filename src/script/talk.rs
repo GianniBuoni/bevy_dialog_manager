@@ -2,6 +2,7 @@ use super::*;
 
 pub mod prelude {
     pub use super::TalkNode;
+    pub(crate) use super::TomlTalk;
 }
 
 pub(super) fn plugin(app: &mut App) {
@@ -15,6 +16,15 @@ pub struct TalkNode {
     pub next: Option<Line>,
 }
 
+#[derive(Debug, Default, Deserialize)]
+pub(crate) struct TomlTalk {
+    pub(crate) text: TomlText,
+    pub(crate) next: Option<Line>,
+}
+
+#[derive(Debug, Default, Deserialize)]
+pub(crate) struct TomlText(pub Vec<TextLine>);
+
 impl From<TomlTalk> for TalkNode {
     fn from(value: TomlTalk) -> Self {
         let text = value.text.0.into();
@@ -22,14 +32,5 @@ impl From<TomlTalk> for TalkNode {
             text,
             next: value.next,
         }
-    }
-}
-
-impl Node for TalkNode {
-    fn next(&self) {
-        let Some(next) = self.next.as_ref() else {
-            return;
-        };
-        info!("{next:?}")
     }
 }

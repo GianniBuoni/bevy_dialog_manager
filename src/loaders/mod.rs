@@ -2,13 +2,6 @@ use bevy::{asset::AssetLoader, prelude::*};
 
 use crate::prelude::*;
 
-mod de;
-mod toml_types;
-
-pub mod prelude {
-    pub(crate) use super::toml_types::predlude::*;
-}
-
 pub struct DialogLoaderPlugin;
 
 impl Plugin for DialogLoaderPlugin {
@@ -50,7 +43,7 @@ impl AssetLoader for DialogAssetLoader {
                 e
             })?;
         // parse the toml script into a dialog script
-        raw_script.try_into()
+        Ok(raw_script.into())
     }
 
     fn extensions(&self) -> &[&str] {
