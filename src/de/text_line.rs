@@ -2,7 +2,7 @@ use bevy::platform::collections::HashMap;
 
 use super::*;
 
-impl<'de> Deserialize<'de> for TextLine {
+impl<'de> Deserialize<'de> for TomlTextLine {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: de::Deserializer<'de>,
@@ -10,7 +10,7 @@ impl<'de> Deserialize<'de> for TextLine {
         struct TextLineVisitor;
 
         impl<'de> Visitor<'de> for TextLineVisitor {
-            type Value = TextLine;
+            type Value = TomlTextLine;
 
             fn expecting(
                 &self,
@@ -29,7 +29,7 @@ impl<'de> Deserialize<'de> for TextLine {
                 {
                     line_map.insert(k, v);
                 }
-                let line = line_map
+                let line: Line = line_map
                     .get("line")
                     .unwrap_or(&toml::Value::String(String::default()))
                     .as_str()
@@ -40,7 +40,16 @@ impl<'de> Deserialize<'de> for TextLine {
                     .get("id")
                     .unwrap_or(&toml::Value::Integer(0))
                     .as_integer()
-                    .unwrap_or_default() as usize;
+                    .unwrap_or_default();
+
+                // validate id data
+                if id < 0 {
+                    let msg = ScriptValidationError::InvalidId {
+                        text_line: line.0.to_string(),
+                        id: id,
+                    };
+                    return Err(de::Error::custom(msg));
+                }
 
                 let weight = line_map
                     .get("weight")
@@ -48,7 +57,11 @@ impl<'de> Deserialize<'de> for TextLine {
                     .as_float()
                     .unwrap_or_default() as f32;
 
-                Ok(TextLine { line, id, weight })
+                Ok(TomlTextLine {
+                    line,
+                    id: IdAssigned::Assigned(id as usize),
+                    weight,
+                })
             }
 
             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
@@ -56,9 +69,9 @@ impl<'de> Deserialize<'de> for TextLine {
                 E: de::Error,
             {
                 let line = Line(v.into());
-                Ok(TextLine {
+                Ok(TomlTextLine {
                     line,
-                    id: 0,
+                    id: IdAssigned::Unassigned,
                     weight: 1.,
                 })
             }
@@ -73,7 +86,7 @@ mod tests {
 
     #[derive(Deserialize, PartialEq, Debug)]
     struct TestStruct {
-        text: TextLine,
+        text: TomlTextLine,
     }
 
     #[test]
@@ -81,9 +94,9 @@ mod tests {
         let mut test_cases = Vec::new();
         test_cases.push((
             TestStruct {
-                text: TextLine {
+                text: TomlTextLine {
                     line: Line("Oh hi, there!".into()),
-                    id: 0,
+                    id: IdAssigned::Unassigned,
                     weight: 1.,
                 },
             },
@@ -92,9 +105,9 @@ mod tests {
         ));
         test_cases.push((
             TestStruct {
-                text: TextLine {
+                text: TomlTextLine {
                     line: Line("This is a random line.".into()),
-                    id: 0,
+                    id: IdAssigned::Assigned(0),
                     weight: 0.5,
                 },
             },
@@ -112,6 +125,10 @@ mod tests {
             (
                 "text = [1, 2, \"three\"]",
                 "invalid type: mixed strings and int",
+            ),
+            (
+                "text = [{ line = \"bad id\", id = -1, weight = 1.0 }]",
+                "invalid id: negative integer",
             ),
         ];
         de_error_test::<TestStruct>(test_cases)

@@ -13,6 +13,7 @@ mod line;
 mod text_line;
 mod toml_node;
 mod toml_node_map;
+mod toml_text;
 
 #[cfg(test)]
 fn de_test<'de, D>(test_cases: Vec<(D, &'de str, &'de str)>) -> Result<()>

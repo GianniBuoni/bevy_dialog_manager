@@ -8,11 +8,6 @@ pub mod prelude {
     pub(crate) use super::TomlNode;
 }
 
-/// Trait defining behavior of all dialog Nodes
-pub trait Node {
-    fn next(&self);
-}
-
 /// Enumeration of all possible actions in a script.
 #[derive(Debug, Reflect)]
 pub enum DialogNode {
