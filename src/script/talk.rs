@@ -11,7 +11,10 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<TalkNode>();
 }
 
-/// The most basic dialog node. Contains text for display.
+/// The most basic dialog node.
+///
+/// Contains text for display and an Option of
+/// the next node's id.
 #[derive(Reflect, Debug, Clone)]
 pub struct TalkNode {
     pub text: std::sync::Arc<[TextLine]>,

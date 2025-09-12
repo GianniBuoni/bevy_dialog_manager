@@ -6,7 +6,6 @@ pub mod prelude {
     pub(crate) use super::{IdAssigned, TextLine, TomlTextLine};
 }
 
-/// Plugin for this module
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<TextLine>();
     app.register_type::<Line>();
@@ -38,6 +37,9 @@ pub struct TomlTextLine {
     pub weight: f32,
 }
 
+/// Enum for deserializing a TomlTextLine id's.
+/// Handles thes possibility that the id has not been
+/// assigned in the TOML file.
 #[derive(Debug, PartialEq)]
 pub enum IdAssigned {
     Unassigned,

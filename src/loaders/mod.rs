@@ -2,6 +2,8 @@ use bevy::{asset::AssetLoader, prelude::*};
 
 use crate::prelude::*;
 
+/// Required. Plugin that provides the custom asset loader
+/// for dialog TOML files.
 pub struct DialogLoaderPlugin;
 
 impl Plugin for DialogLoaderPlugin {

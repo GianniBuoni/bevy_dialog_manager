@@ -11,6 +11,8 @@ pub mod prelude {
     pub use super::script::prelude::*;
 }
 
+/// Plugin group adding all of the library's sub-plugins.
+/// All the plugins work together to load dialog assets into the game.
 pub struct DialogManagerPlugin;
 
 impl PluginGroup for DialogManagerPlugin {

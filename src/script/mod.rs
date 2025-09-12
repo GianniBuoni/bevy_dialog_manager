@@ -10,6 +10,8 @@ mod nodes;
 mod root;
 mod talk;
 
+/// Required. Plugin registers types related to nodes and fields
+/// that make up all the node types.
 pub struct NodesPlugin;
 
 pub mod prelude {
@@ -31,20 +33,25 @@ impl Plugin for NodesPlugin {
     }
 }
 
-/// Main Asset for the loader
+/// Main Asset for the loader. Contains a root node
+/// that provides metadata about the entire conversation tree,
+/// and a hashmap of Line -> DialogNode pairs.
 #[derive(Debug, Asset, Reflect)]
 pub struct DialogScript {
     pub root: RootNode,
     pub script: HashMap<Line, DialogNode>,
 }
 
-/// Toml representation of a Dialog script
+/// Toml representation of a Dialog script.
 #[derive(Debug, Deserialize)]
 pub(crate) struct TomlScript {
     pub(crate) root: RootNode,
     pub(crate) script: TomlNodeMap,
 }
 
+/// Newtype wrapper for a Line -> TomlNode hashmap.
+/// Used only during deserialization. The asset loader will
+/// call the conversion that handles unwrapping the hashmap.
 #[derive(Debug, Default, PartialEq)]
 pub(crate) struct TomlNodeMap(pub(crate) HashMap<Line, TomlNode>);
 
