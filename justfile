@@ -3,3 +3,6 @@ ex bin:
 
 test:
     cargo test
+
+lint:
+    cargo clippy --all-targets -- -Dwarnings

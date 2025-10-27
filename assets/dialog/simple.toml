@@ -1,15 +1,15 @@
 [root]
 start_node = "say_hi"
 
-[talk."say_hi"]
+[script."say_hi".talk]
 text = [
   "Oh hi, there!",
   "This is a new dialog asset.",
 ]
 next = "random"
 
-[talk."random"]
+[script."random".talk]
 text = [
-  {id = 0, line = "This is a random line."}
-  {id = 0, line = "This another random line."}
+  {id = 0, weight = 0.5, line = "This is a random line."},
+  {id = 0, weight = 0.5, line = "This another random line."},
 ]
