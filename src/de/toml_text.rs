@@ -27,7 +27,7 @@ impl<'de> Deserialize<'de> for TomlText {
                 let mut values = Vec::new();
                 while let Some(v) = seq.next_element::<toml::Value>()? {
                     let text_line = TomlTextLine::deserialize(v)
-                        .map_err(|e| de::Error::custom(e))?;
+                        .map_err(de::Error::custom)?;
                     values.push(text_line);
                 }
                 // assign id's and make TomlTextLine -> TextLine conversions
@@ -41,11 +41,11 @@ impl<'de> Deserialize<'de> for TomlText {
                         TextLine::try_from(f)
                     })
                     .collect::<Result<Vec<TextLine>, ScriptValidationError>>()
-                    .map_err(|e| de::Error::custom(e))?;
+                    .map_err(de::Error::custom)?;
 
                 let text = TomlText(values);
                 // validate probablity weights
-                text.validate_weights().map_err(|e| de::Error::custom(e))?;
+                text.validate_weights().map_err(de::Error::custom)?;
 
                 Ok(text)
             }
@@ -113,15 +113,16 @@ mod tests {
 
     #[test]
     fn test_de_basic() -> Result<()> {
-        let want = (|| {
-            let mut want = Vec::<TextLine>::new();
-            want.push(text_line("Oh hi, there!", 0, 1.));
-            want.push(text_line("This is a new dialog asset.", 1, 1.));
+        let want = {
+            let want = vec![
+                text_line("Oh hi, there!", 0, 1.),
+                text_line("This is a new dialog asset.", 1, 1.),
+            ];
 
             TestStruct {
                 text: TomlText(want),
             }
-        })();
+        };
 
         let got = toml::from_str::<TestStruct>(TEST_TOML_1)?;
         assert_eq!(want, got, "Test deserializing basic string values.");
@@ -134,15 +135,16 @@ mod tests {
 
     #[test]
     fn test_de_with_weights() -> Result<()> {
-        let want = (|| {
-            let mut want = Vec::<TextLine>::new();
-            want.push(text_line("Oh hi, there!", 0, 0.5));
-            want.push(text_line("This is a new dialog asset.", 0, 0.5));
+        let want = {
+            let want = vec![
+                text_line("Oh hi, there!", 0, 0.5),
+                text_line("This is a new dialog asset.", 0, 0.5),
+            ];
 
             TestStruct {
                 text: TomlText(want),
             }
-        })();
+        };
 
         let got = toml::from_str::<TestStruct>(TEST_TOML_RANDOM)?;
         assert_eq!(want, got, "Test deserializing lines with the same id");
@@ -152,16 +154,17 @@ mod tests {
 
     #[test]
     fn test_de_mixed_text_types() -> Result<()> {
-        let want = (|| {
-            let mut want = Vec::<TextLine>::new();
-            want.push(text_line("Oh hi, there!", 0, 1.0));
-            want.push(text_line("Random.", 1, 0.5));
-            want.push(text_line("This is a new dialog asset.", 1, 0.5));
+        let want = {
+            let want = vec![
+                text_line("Oh hi, there!", 0, 1.0),
+                text_line("Random.", 1, 0.5),
+                text_line("This is a new dialog asset.", 1, 0.5),
+            ];
 
             TestStruct {
                 text: TomlText(want),
             }
-        })();
+        };
 
         let got = toml::from_str::<TestStruct>(MIXED_TYPES)?;
         assert_eq!(

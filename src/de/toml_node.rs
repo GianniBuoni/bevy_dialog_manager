@@ -28,7 +28,7 @@ impl<'de> Deserialize<'de> for TomlNode {
                     map.next_entry::<String, toml::Table>()?
                 {
                     let node = TomlNode::from_toml_value(node.as_str(), value)
-                        .map_err(|e| de::Error::custom(e))?;
+                        .map_err(de::Error::custom)?;
 
                     Ok(node)
                 } else {
@@ -51,8 +51,7 @@ mod tests {
 
     #[test]
     fn test_de() -> Result<()> {
-        let mut test_cases = Vec::new();
-        test_cases.push((
+        let test_cases = vec![(
             TestStruct {
                 node: TomlNode::Talk(TomlTalk {
                     text: TomlText(vec![TextLine {
@@ -65,7 +64,7 @@ mod tests {
             },
             "node.talk = { text = [\"line\"], next = \"next\" }",
             "node.talk = { text = [\"line\"], next = \"next\" }",
-        ));
+        )];
         de_test::<TestStruct>(test_cases)
     }
 

@@ -46,7 +46,7 @@ impl<'de> Deserialize<'de> for TomlTextLine {
                 if id < 0 {
                     let msg = ScriptValidationError::InvalidId {
                         text_line: line.0.to_string(),
-                        id: id,
+                        id,
                     };
                     return Err(de::Error::custom(msg));
                 }
@@ -91,29 +91,30 @@ mod tests {
 
     #[test]
     fn test_de() -> Result<()> {
-        let mut test_cases = Vec::new();
-        test_cases.push((
-            TestStruct {
-                text: TomlTextLine {
-                    line: Line("Oh hi, there!".into()),
-                    id: IdAssigned::Unassigned,
-                    weight: 1.,
+        let test_cases = vec![
+            (
+                TestStruct {
+                    text: TomlTextLine {
+                        line: Line("Oh hi, there!".into()),
+                        id: IdAssigned::Unassigned,
+                        weight: 1.,
+                    },
                 },
-            },
-            "text = \"Oh hi, there!\"",
-            "string",
-        ));
-        test_cases.push((
-            TestStruct {
-                text: TomlTextLine {
-                    line: Line("This is a random line.".into()),
-                    id: IdAssigned::Assigned(0),
-                    weight: 0.5,
+                "text = \"Oh hi, there!\"",
+                "string",
+            ),
+            (
+                TestStruct {
+                    text: TomlTextLine {
+                        line: Line("This is a random line.".into()),
+                        id: IdAssigned::Assigned(0),
+                        weight: 0.5,
+                    },
                 },
-            },
-            "text = {id = 0, weight = 0.5, line = \"This is a random line.\"}",
-            "map",
-        ));
+                "text = {id = 0, weight = 0.5, line = \"This is a random line.\"}",
+                "map",
+            ),
+        ];
         de_test::<TestStruct>(test_cases)
     }
 

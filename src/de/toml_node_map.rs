@@ -28,8 +28,8 @@ impl<'de> Deserialize<'de> for TomlNodeMap {
                     map.next_entry::<String, toml::Table>()?
                 {
                     let line = Line(k.into());
-                    let node = TomlNode::deserialize(v)
-                        .map_err(|e| de::Error::custom(e))?;
+                    let node =
+                        TomlNode::deserialize(v).map_err(de::Error::custom)?;
                     node_map.insert(line, node);
                 }
                 Ok(TomlNodeMap(node_map))
@@ -75,28 +75,29 @@ mod tests {
 
     #[test]
     fn test_de() -> Result<()> {
-        let mut test_cases = Vec::<(TestStruct, &str, &str)>::new();
-        test_cases.push((
-            TestStruct {
-                script: toml_node_map("line"),
-            },
-            "script.line.talk = { text = [\"line\"], next = \"line\" }",
-            "script.line.talk = { text = [\"line\"], next = \"line\" }",
-        ));
-        test_cases.push((
-            TestStruct {
-                script: toml_node_map("works ok"),
-            },
-            "script.\"works ok\".talk = { text = [\"line\"], next = \"line\" }",
-            "script.\"works ok\".talk = { text = [\"line\"], next = \"line\" }",
-        ));
-        test_cases.push((
-            TestStruct {
-                script: toml_node_map("1"),
-            },
-            "script.1.talk = { text = [\"line\"], next = \"line\" }",
-            "script.1.talk = { text = [\"line\"], next = \"line\" }",
-        ));
+        let test_cases = vec![
+            (
+                TestStruct {
+                    script: toml_node_map("line"),
+                },
+                "script.line.talk = { text = [\"line\"], next = \"line\" }",
+                "script.line.talk = { text = [\"line\"], next = \"line\" }",
+            ),
+            (
+                TestStruct {
+                    script: toml_node_map("works ok"),
+                },
+                "script.\"works ok\".talk = { text = [\"line\"], next = \"line\" }",
+                "script.\"works ok\".talk = { text = [\"line\"], next = \"line\" }",
+            ),
+            (
+                TestStruct {
+                    script: toml_node_map("1"),
+                },
+                "script.1.talk = { text = [\"line\"], next = \"line\" }",
+                "script.1.talk = { text = [\"line\"], next = \"line\" }",
+            ),
+        ];
         de_test::<TestStruct>(test_cases)
     }
 

@@ -39,21 +39,22 @@ mod tests {
 
     #[test]
     fn test_de() -> Result<()> {
-        let mut test_cases = Vec::new();
-        test_cases.push((
-            TestStruct {
-                text: Line("This is a line".into()),
-            },
-            "text = \"This is a line\"",
-            "string",
-        ));
-        test_cases.push((
-            TestStruct {
-                text: Line("Wow another line".into()),
-            },
-            "text = \"Wow another line\"",
-            "string",
-        ));
+        let test_cases = vec![
+            (
+                TestStruct {
+                    text: Line("This is a line".into()),
+                },
+                "text = \"This is a line\"",
+                "string",
+            ),
+            (
+                TestStruct {
+                    text: Line("Wow another line".into()),
+                },
+                "text = \"Wow another line\"",
+                "string",
+            ),
+        ];
         de_test::<TestStruct>(test_cases)
     }
 
