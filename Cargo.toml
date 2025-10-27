@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.99"
 bevy = { version = "0.17.2", default-features = false, features = ["bevy_asset", "bevy_log"] }
-indexmap = { version = "2.11.0", features = ["serde"] }
 serde = { version = "1.0.219", features = ["derive"] }
 strum = { version = "0.27.2", features = ["derive"] }
 thiserror = "2.0.16"
