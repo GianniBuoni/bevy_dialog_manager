@@ -14,7 +14,7 @@ impl Plugin for DialogLoaderPlugin {
 }
 
 #[derive(Default)]
-pub struct DialogAssetLoader;
+pub(crate) struct DialogAssetLoader;
 
 impl AssetLoader for DialogAssetLoader {
     type Asset = DialogScript;

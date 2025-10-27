@@ -3,11 +3,13 @@ use bevy::{app::PluginGroupBuilder, prelude::*};
 mod de;
 mod errors;
 mod loaders;
+mod resources;
 mod script;
 
 pub mod prelude {
     pub use super::DialogManagerPlugin;
     pub use super::errors::prelude::*;
+    pub use super::resources::prelude::*;
     pub use super::script::prelude::*;
 }
 
@@ -20,5 +22,6 @@ impl PluginGroup for DialogManagerPlugin {
         PluginGroupBuilder::start::<Self>()
             .add(script::NodesPlugin)
             .add(loaders::DialogLoaderPlugin)
+            .add(resources::DialogRescourcePlugin)
     }
 }

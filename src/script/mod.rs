@@ -12,7 +12,7 @@ mod talk;
 
 /// Required. Plugin registers types related to nodes and fields
 /// that make up all the node types.
-pub struct NodesPlugin;
+pub(crate) struct NodesPlugin;
 
 pub mod prelude {
     pub use super::DialogScript;
