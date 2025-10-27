@@ -14,6 +14,14 @@ pub enum DialogNode {
     Talk(TalkNode),
 }
 
+impl DialogNode {
+    pub fn next(&self) -> Option<Line> {
+        match self {
+            Self::Talk(node) => node.next.clone(),
+        }
+    }
+}
+
 #[derive(Debug, Display, PartialEq)]
 pub(crate) enum TomlNode {
     Talk(TomlTalk),
