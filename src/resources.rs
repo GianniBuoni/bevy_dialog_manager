@@ -20,7 +20,6 @@ pub struct CurrentDialogNode {
 }
 impl Plugin for DialogRescourcePlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<CurrentDialogNode>();
         app.init_resource::<CurrentDialogNode>();
     }
 }

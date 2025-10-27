@@ -6,11 +6,6 @@ pub mod prelude {
     pub(crate) use super::{IdAssigned, TextLine, TomlTextLine};
 }
 
-pub(super) fn plugin(app: &mut App) {
-    app.register_type::<TextLine>();
-    app.register_type::<Line>();
-}
-
 /// Newtype alias for [`Arc<str>`]
 #[derive(Debug, Default, Clone, Reflect, Hash, PartialEq, Eq)]
 pub struct Line(pub std::sync::Arc<str>);

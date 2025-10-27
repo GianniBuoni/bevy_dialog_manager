@@ -20,7 +20,6 @@ pub struct DialogManagerPlugin;
 impl PluginGroup for DialogManagerPlugin {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
-            .add(script::NodesPlugin)
             .add(loaders::DialogLoaderPlugin)
             .add(resources::DialogRescourcePlugin)
     }

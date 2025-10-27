@@ -10,10 +10,6 @@ mod nodes;
 mod root;
 mod talk;
 
-/// Required. Plugin registers types related to nodes and fields
-/// that make up all the node types.
-pub(crate) struct NodesPlugin;
-
 pub mod prelude {
     pub use super::DialogScript;
     pub(crate) use super::components::prelude::*;
@@ -21,16 +17,6 @@ pub mod prelude {
     pub use super::root::prelude::*;
     pub use super::talk::prelude::*;
     pub(crate) use super::{TomlNodeMap, TomlScript};
-}
-
-impl Plugin for NodesPlugin {
-    fn build(&self, app: &mut App) {
-        app.register_type::<DialogScript>();
-
-        app.add_plugins(components::plugin);
-        app.add_plugins(talk::plugin);
-        app.add_plugins(root::plugin);
-    }
 }
 
 /// Main Asset for the loader. Contains a root node

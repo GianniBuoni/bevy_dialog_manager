@@ -7,10 +7,6 @@ pub mod prelude {
     pub(crate) use super::{TomlTalk, TomlText};
 }
 
-pub(super) fn plugin(app: &mut App) {
-    app.register_type::<TalkNode>();
-}
-
 /// The most basic dialog node.
 ///
 /// Contains text for display and an Option of
